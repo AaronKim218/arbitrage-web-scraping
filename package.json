@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "arbitrage-web-scraping",
   "version": "1.0.0",
   "description": "",
@@ -8,5 +9,13 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "playwright": "^1.40.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.40.1"
+  }
 }

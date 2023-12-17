@@ -1,0 +1,26 @@
+US Odds (-125, +400, etc.) to decimal number:
+Positive US odds: odds/100 + 1
+Negative US odds: 100/odds + 1
+
+Ex: 
+-110-> 100/-110 + 1 = .0909
++110-> 110/100 + 1 = 2.1
+
+Probability:
+1 / decimal odds
+
+Ex:
+1 / .0909 = .11 OR 11%
+1 / 2.1 = .476 OR 11%
+
+Determining if there is an arbitrage opportunity:
+Take probability of two websites, A, B, if A+B>1 there is no opportunity
+
+Ex:
+.11 + .476 = .586 <- works
+
+
+
+Calculating amount to bed on each outcome:
+Pick an amount to bet in total, S
+Bet per side = S * probability
