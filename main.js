@@ -1,5 +1,4 @@
 import findArbitrage from "./findArbitrage.js";
-import logger from "./logger.js";
 
 async function main() {
     // ask for user input from terminal to get config for scraping

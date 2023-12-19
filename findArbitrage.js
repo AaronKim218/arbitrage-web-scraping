@@ -1,95 +1,62 @@
-import { chromium } from "playwright";
-import { convertOddsToDecimal, isArbitragePossible, calculateProbability, calculateBet } from "./src/resources/FormulaCode.js";
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin from 'puppeteer-extra-plugin-stealth'
+import { convertOddsToDecimal, isArbitragePossible, calculateProbability, calculateBet } from "./FormulaCode.js"
 
 const fanduelNBA = 'https://sportsbook.fanduel.com/basketball?tab=nba';
 const draftkingsNBA = 'https://sportsbook.draftkings.com/leagues/basketball/nba';
+let data = [];
 
-export default async function findArbitrage(sites, game, logger) {
-
-    let data = [];
-    await fanduelScraper(game);
+export default async function findArbitrage(){
+    await fanduelScraper();
     console.log(data);
-
-    // add web scraping data to data object
-    // for (const site in sites) {
-    //     console.log(site);
-    //     switch (site) {
-    //         case 'FANDUEL':
-    //             data[site] = await fanduelScraper(game);
-    //             break;
-    //         case 'DRAFTKINGS':
-    //             data[site] = await draftkingsScraper(game);
-    //             break;
-    //         default:
-    //             console.log("Invalid site");
-    //     }
-    // }
-
-    // do some math with data (call some calculateArbitrage function that should be in resources/arbitrage.js)
-    // const results = calculateArbitrage(data);
-
-    // log results
-    
+    return data;
 }
 
-
-// const { chromium } = require('playwright');
-//     (async () => {
-//       const browser = await chromium.launch();
-//       const page = await browser.newPage();
-//       await page.goto('https://yourwebsite.com');
-    
-//       // Select all divs where aria-label contains a specific string
-//       const searchString = 'part_of_aria_label';
-//       const divsWithAriaLabel = await page.$$(`div[aria-label*="${searchString}"]`);
-    
-//       // Iterate over the elements and perform actions
-//       for (const div of divsWithAriaLabel) {
-//         const textContent = await div.textContent();
-//         console.log(textContent);
-//       }
-    
-//       await browser.close();
-//     })();
-// }
-
-async function fanduelScraper(game) {
-    const team = 'Los Angeles Lakers';
+async function fanduelScraper() {
+    const team = 'San Antonio Spurs';
     const FANDUEL_MONEYLINE = 1;
     
-    const browser = await chromium.launch({headless: false,});
-    const context = await browser.newContext();
-    const page = await context.newPage();
-    await page.goto(fanduelNBA)
-
-    const divsWithAriaLabel = await page.$$(`div[aria-label*="${team}"]`);
-    const games = [];
-
-    for (let i=FANDUEL_MONEYLINE; i<divsWithAriaLabel.length; i+=3) {
-        //line will be of the form: "Team Name, +/-num Odds"
-        const line = divsWithAriaLabel[i];
-        
-        //first append the string to be "+/-num Odds"
-        let j = 0;
-        while(line.charAt(i) != '+' | line.charAt(i) != '-' )
-            j++;
-        line = line.substring(j,line.length());
-        //then append the string to be "+/-num"
-        j = 0;
-        while(line.charAt(i) != ' ')
-            j++;
-        line = line.substring(0,j);
-        //convert string number to integer
-        const intValueOfString = parseInt(line);
-        
-        //convert odds to decimal value, and then convert decimal value to probability
-        const probability = calculateProbability(convertOddsToDecimal(intValueOfString));
-        data.push(probability);
-
+    puppeteer.use(StealthPlugin());
+    
+    try{
+        const browser = await puppeteer.launch({ headless: false })
+        const page = await browser.newPage()
+        await page.goto(fanduelNBA)
+        const elements = await page.$$(`div[aria-label*="${team}"]`);
+        const elementsHTML = await Promise.all(elements.map(element => element.evaluate(node => node.outerHTML)));
+        for (let i=FANDUEL_MONEYLINE; i<elementsHTML.length; i+=3) {
+            //line will contain all of the html information, so we need to append it down to only have the odds"
+            let line = elementsHTML[i];
+            
+            //removes excess html in beginning
+            const comma = line.indexOf(',');
+            line = line.substring(comma,line.length);
+            
+            const plus = line.indexOf('+');
+            const minus = line.indexOf('-');
+            if(plus == -1 | minus == -1)
+                line = line.substring(Math.max(plus, minus),line.length);
+            else
+                line = line.substring(Math.min(plus, minus),line.length);
+            
+            //removes excess html in the end
+            const end = line.indexOf(' ');
+            line = line.substring(0, end);
+            
+            
+            //convert string number to integer
+            const intValueOfString = parseInt(line);
+            // console.log(intValueOfString);
+            
+            //convert odds to decimal value, and then convert decimal value to probability
+            let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
+            data.push(probability);
+        }
+        await browser.close()
     }
-    await browser.close(); 
+    catch(e){
+        console.log(e.stack);
+        console.log(e.name);
+        console.log(e.message);
+    }
 }
-
-// async function draftkingsScraper(game) {
-//     await page.goto(draftkingsNBA)
-// }
