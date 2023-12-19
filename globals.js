@@ -30,7 +30,14 @@ export const TEAMINDICES = {
     'Warriors': 28,
     'Wizards': 29
 }
+
 export const SITEINDICES = {
     'Fanduel' : 0,
     'Draftkings' : 1
 }
+
+export const TEAMS = [
+    '76ers', 'Bucks', 'Bulls', 'Cavaliers', 'Celtics', 'Clippers', 'Grizzlies', 'Hawks', 'Heat', 'Hornets',
+    'Jazz', 'Kings', 'Knicks', 'Lakers', 'Magic', 'Mavericks', 'Nets', 'Nuggets', 'Pacers', 'Pelicans',
+    'Pistons', 'Raptors', 'Rockets', 'Spurs', 'Suns', 'Thunder', 'Timberwolves', 'Trail Blazers', 'Warriors', 'Wizards'
+  ];

@@ -96,7 +96,7 @@ async function draftkingsScraper() {
         let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
         data.push(probability);
         
-        await browser.close()
+        await browser.close();
     } catch(e){
         console.log(e.stack);
         console.log(e.name);
