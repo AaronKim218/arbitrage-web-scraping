@@ -9,9 +9,22 @@ main idea:
 
 
 FIRST IMPLEMENTATION:
-- looking only at lakers games
+- looking only at lakers games done
+
+
+
+
 
 
 FINAL FUNCTIONALITY:
 - allow user to pick sports to consider from a given list
 - gives list of opportunites with bets for the specific sites
+
+Data struct:
+2d array x = site y = team
+
+Sites to consider:
+Fanduel
+Draftkings
+
+
