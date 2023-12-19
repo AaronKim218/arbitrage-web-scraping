@@ -14,8 +14,8 @@ async function main() {
     // for (const game in GAMES) {
     //     findArbitrage(logger);
     // }
-
-    getGames();
+    findArbitrage(logger);
+    //getGames();
 
 }
 

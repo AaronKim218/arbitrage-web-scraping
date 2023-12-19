@@ -11,8 +11,11 @@ export default async function getGames(date = -1){
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth() + 1;
     const currentDay = currentDate.getDate();
-
     
+    date = date.toString();
+    let year = date.substring(4,date.length);
+    let month = date.substring(2,4);
+    let day = date.substring(0,2);
     let url = '';
     if(date == -1)
     {
@@ -30,7 +33,7 @@ export default async function getGames(date = -1){
     puppeteer.use(StealthPlugin());
     
     try{
-        const browser = await puppeteer.launch({ headless: true })
+        const browser = await puppeteer.launch({ headless: false })
         const page = await browser.newPage()
         await page.goto(url);
         const gameData = await page.$$eval('div[class*=GameCardMatchup_wrapper]', divs => divs.map(div => div.outerHTML));

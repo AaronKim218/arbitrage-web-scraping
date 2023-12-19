@@ -6,16 +6,16 @@ import { TEAMINDICES, SITEINDICES } from './globals.js';
 const fanduelNBA = 'https://sportsbook.fanduel.com/basketball?tab=nba';
 const draftkingsNBA = 'https://sportsbook.draftkings.com/leagues/basketball/nba';
 
-
+let temp = [];
 
 async function fanduelScraper() {
-    const team = 'Spurs';
+    const team = 'Grizzlies';
     const FANDUEL_MONEYLINE = 1;
     
     puppeteer.use(StealthPlugin());
     
     try{
-        const browser = await puppeteer.launch({ headless: false })
+        const browser = await puppeteer.launch({ headless: true })
         const page = await browser.newPage()
         await page.goto(fanduelNBA)
         const elements = await page.$$(`div[aria-label*="${team}"]`);
@@ -46,7 +46,7 @@ async function fanduelScraper() {
         
         //convert odds to decimal value, and then convert decimal value to probability
         let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
-        data.push(probability);
+        temp.push(probability);
         
         await browser.close()
     } catch(e){
@@ -56,7 +56,7 @@ async function fanduelScraper() {
     }
 }
 async function draftkingsScraper() {
-    const team = 'Spurs';
+    const team = 'Grizzlies';
     
     puppeteer.use(StealthPlugin());
     
@@ -84,7 +84,6 @@ async function draftkingsScraper() {
 
         arrow = line.indexOf('<');
         line = line.substring(0,arrow);
-        console.log(line);
         
         
         
@@ -94,7 +93,7 @@ async function draftkingsScraper() {
         
         //convert odds to decimal value, and then convert decimal value to probability
         let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
-        data.push(probability);
+        temp.push(probability);
         
         await browser.close();
     } catch(e){
@@ -108,43 +107,43 @@ export default async function findArbitrage(logger){
     await fanduelScraper();
     await draftkingsScraper();
 
-    console.log(data);
+    console.log(temp);
 
-    tryCombinations(sites, games, data, logger);
+    //tryCombinations(sites, games, data, logger);
 
-    return data;
+    return temp;
 }
 
-function tryCombinations(SITEINDICES, games, data, logger) {
-    for (const game in games) {
+// function tryCombinations(SITEINDICES, games, data, logger) {
+//     for (const game in games) {
 
-        // depends on how we store games
-        const team1 = game[0]
-        const team2 = game[1]
+//         // depends on how we store games
+//         const team1 = game[0]
+//         const team2 = game[1]
 
-        // somehow get indices of team1 and team2 in data
-        const team1Index = TEAMINDICES[team1]
-        const team2Index = TEAMINDICES[team2]
+//         // somehow get indices of team1 and team2 in data
+//         const team1Index = TEAMINDICES[team1]
+//         const team2Index = TEAMINDICES[team2]
 
-        // these two loops try all combinations of sites
-        for (let i=0; i<SITEINDICES.length; i++) {
-            for (let j=i+1; j<SITEINDICES.length; j++) {
-                if (isArbitragePossible(data[i][team1Index], data[j][team2])) {
-                    logger.info(`Arbitrage possible for ${team1} and ${team2} between ${i} and ${j}`)
-                } else {
-                    console.log(`Arbitrage not possible for ${team1} and ${team2} between ${i} and ${j}`)
-                }
-            }
-        }
+//         // these two loops try all combinations of sites
+//         for (let i=0; i<SITEINDICES.length; i++) {
+//             for (let j=i+1; j<SITEINDICES.length; j++) {
+//                 if (isArbitragePossible(data[i][team1Index], data[j][team2])) {
+//                     logger.info(`Arbitrage possible for ${team1} and ${team2} between ${i} and ${j}`)
+//                 } else {
+//                     console.log(`Arbitrage not possible for ${team1} and ${team2} between ${i} and ${j}`)
+//                 }
+//             }
+//         }
 
-        for (let i=0; i<SITEINDICES.length; i++) {
-            for (let j=i+1; j<SITEINDICES.length; j++) {
-                if (isArbitragePossible(data[i][team2Index], data[j][team1Index])) {
-                    logger.info(`Arbitrage possible for ${team1} and ${team2} between ${i} and ${j}`)
-                } else {
-                    console.log(`Arbitrage not possible for ${team1} and ${team2} between ${i} and ${j}`)
-                }
-            }
-        }
-    }
-}
+//         for (let i=0; i<SITEINDICES.length; i++) {
+//             for (let j=i+1; j<SITEINDICES.length; j++) {
+//                 if (isArbitragePossible(data[i][team2Index], data[j][team1Index])) {
+//                     logger.info(`Arbitrage possible for ${team1} and ${team2} between ${i} and ${j}`)
+//                 } else {
+//                     console.log(`Arbitrage not possible for ${team1} and ${team2} between ${i} and ${j}`)
+//                 }
+//             }
+//         }
+//     }
+// }
