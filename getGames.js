@@ -4,31 +4,15 @@ import { TEAMS } from './globals.js';
 
 let globalDate = '';
 
-
-//date in format daymonthyear (no spaces, full 4 digits of year and include any leading zeros for single digit days/months)
-export default async function getGames(date = -1){
+export default async function getGames(){
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
     const currentMonth = currentDate.getMonth() + 1;
     const currentDay = currentDate.getDate();
     
-    date = date.toString();
-    let year = date.substring(4,date.length);
-    let month = date.substring(2,4);
-    let day = date.substring(0,2);
-    let url = '';
-    if(date == -1)
-    {
-        url = 'https://www.nba.com/games?date=' + currentYear + '-' + currentMonth + '-' + currentDay;
-        globalDate = currentMonth + '-' + currentDay + '-' + currentYear;
-    }
-        
-    else
-    {
-        url = 'https://www.nba.com/games?date=' + year + '-' + month + '-' + day;
-        globalDate = month + '-' + day + '-' + year;
-    }
-        
+    
+    let url = 'https://www.nba.com/games?date=' + currentYear + '-' + currentMonth + '-' + currentDay;
+    globalDate = currentMonth + '-' + currentDay + '-' + currentYear;
     
     puppeteer.use(StealthPlugin());
     
