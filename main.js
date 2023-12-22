@@ -8,8 +8,9 @@ async function main() {
     let data = await getGames();
     // console.log(data);
     let flattenedData = data.reduce((acc, val) => acc.concat(val), []);
-    console.log(flattenedData);
-    
+    // console.log('flatten', flattenedData);
+    flattenedData = flattenedData.slice(12);
+    // console.log('flatten', flattenedData);
     await findArbitrage(flattenedData, logger);
 
     

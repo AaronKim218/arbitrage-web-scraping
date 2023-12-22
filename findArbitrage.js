@@ -1,7 +1,7 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import { convertOddsToDecimal, isArbitragePossible, calculateProbability, calculateBet } from "./src/resources/calculations.js"
-import { TEAMINDICES, SITEINDICES, TEAMS } from './globals.js';
+//import { TEAMINDICES, SITEINDICES, TEAMS } from './globals.js';
 
 const fanduelNBA = 'https://sportsbook.fanduel.com/basketball?tab=nba';
 const draftkingsNBA = 'https://sportsbook.draftkings.com/leagues/basketball/nba';
@@ -9,13 +9,13 @@ const draftkingsNBA = 'https://sportsbook.draftkings.com/leagues/basketball/nba'
 let temp = [];
 
 export default async function findArbitrage(data, logger){
+    // console.log(data);
     await fanduelScraper(data);
-   //await draftkingsScraper(data);
+    await draftkingsScraper(data);
 
-    // console.log(temp);
+    console.log(temp);
 
     //tryCombinations(sites, games, data, logger);
-    //error is currently that i need to figure out where in the html array the team will be (i think) and change that per team
 }
 
 async function fanduelScraper(teams) {
@@ -23,47 +23,52 @@ async function fanduelScraper(teams) {
     puppeteer.use(StealthPlugin());
     
     try{
-        for(const team in teams)
+        const browser = await puppeteer.launch({ headless: false })
+        const page = await browser.newPage()
+        await page.goto(fanduelNBA)
+        for(let i = 0; i < teams.length; i++)
         {
-            console.log(team);
-            const browser = await puppeteer.launch({ headless: true })
-            const page = await browser.newPage()
-            await page.goto(fanduelNBA)
-            const elements = await page.$$(`div[aria-label*="${team}"]`);
-            const elementsHTML = await Promise.all(elements.map(element => element.evaluate(node => node.outerHTML)));
             
+            await page.waitForSelector(`div[aria-label*="${teams[i]}"]`);
+            const elements = await page.$$(`div[aria-label*="${teams[i]}"]`);
+            // console.log('teams[' + i + ']:',elements);
+            const elementsHTML = await Promise.all(elements.map(element => element.evaluate(node => node.outerHTML)));
+            // console.log('teams[' + i + ']:',elementsHTML);
+            // console.log('teams[' + i + ']:',elementsHTML);
             //line will contain all of the html information, so we need to append it down to only have the odds"
             let line = elementsHTML[1];
+            // console.log(line);
             
             
-            // //removes excess html in beginning
-            // const comma = line.indexOf(',');
-            // line = line.substring(comma,line.length);
+            //removes excess html in beginning
+            const comma = line.indexOf(',');
+            line = line.substring(comma,line.length);
             
-            // const plus = line.indexOf('+');
-            // const minus = line.indexOf('-');
-            // if(plus == -1 | minus == -1)
-            //     line = line.substring(Math.max(plus, minus),line.length);
-            // else
-            //     line = line.substring(Math.min(plus, minus),line.length);
+            const plus = line.indexOf('+');
+            const minus = line.indexOf('-');
+            if(plus == -1 | minus == -1)
+                line = line.substring(Math.max(plus, minus),line.length);
+            else
+                line = line.substring(Math.min(plus, minus),line.length);
             
-            // //removes excess html in the end
-            // const end = line.indexOf(' ');
-            // line = line.substring(0, end);
+            //removes excess html in the end
+            const end = line.indexOf(' ');
+            line = line.substring(0, end);
             
             
-            // //convert string number to integer
-            // const intValueOfString = parseInt(line);
-            // // console.log(intValueOfString);
+            //convert string number to integer
+            const intValueOfString = parseInt(line);
+            // console.log(intValueOfString);
             
-            // //convert odds to decimal value, and then convert decimal value to probability
-            // let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
+            //convert odds to decimal value, and then convert decimal value to probability
+            let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
             
-            // temp.push(probability);
-            await browser.close();
+            temp.push(probability);
+            
             
             
         }
+        await browser.close();
         
         
         

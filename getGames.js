@@ -19,7 +19,7 @@ export default async function getGames(){
     try{
         const browser = await puppeteer.launch({ headless: true })
         const page = await browser.newPage()
-        await page.goto(url);
+        await page.goto(url, { waitUntil: 'networkidle2' });
         const gameData = await page.$$eval('div[class*=GameCardMatchup_wrapper]', divs => divs.map(div => div.outerHTML));
         const numGames = gameData.length;
         let data = Array.from(Array(numGames), () => new Array(2));
