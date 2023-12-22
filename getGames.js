@@ -19,7 +19,7 @@ export default async function getGames(){
     try{
         const browser = await puppeteer.launch({ headless: "new" })
         const page = await browser.newPage()
-        await page.goto(url, { waitUntil: 'networkidle2' });
+        await page.goto(url, { waitUntil: 'domcontentloaded' });
         const gameData = await page.$$eval('div[class*=GameCardMatchup_wrapper]', divs =>
             divs.filter(div => {
                 const span = div.querySelector('.LiveBadge_lb__qV_my.GameCardMatchupStatusText_gcsBadge__bWCRV');

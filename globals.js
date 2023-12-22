@@ -37,6 +37,8 @@ export const SITEINDICES = {
     'Draftkings' : 1
 }
 
+export const SITES = ['Fanduel', 'Draftkings'];
+
 export const TEAMS = [
     '76ers', 'Bucks', 'Bulls', 'Cavaliers', 'Celtics', 'Clippers', 'Grizzlies', 'Hawks', 'Heat', 'Hornets',
     'Jazz', 'Kings', 'Knicks', 'Lakers', 'Magic', 'Mavericks', 'Nets', 'Nuggets', 'Pacers', 'Pelicans',

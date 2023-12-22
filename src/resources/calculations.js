@@ -6,8 +6,8 @@ export function calculateProbability(number) {
     return (1.0/number).toPrecision(3);
 }
 
-export function isArbitragePossible(prob1, prob2) {
-    return ((prob1+prob2)<1)
+export function isArbitragePossible(probabilities) {
+    return ((probabilities[0] + probabilities[1])<1)
 }
 
 export function calculateBet(totalBet, probability) {
