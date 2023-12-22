@@ -55,6 +55,7 @@ export default async function getGames(){
             data[i][1] = line.substring(0,j);
         }
         await browser.close();
+        console.log('getGames() done');
         return data;
     
         

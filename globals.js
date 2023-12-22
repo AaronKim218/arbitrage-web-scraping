@@ -1,4 +1,4 @@
-export const TEAMINDICES = {
+const teamMapping = {
     '76ers': 0,
     'Bucks': 1,
     'Bulls': 2,
@@ -30,6 +30,7 @@ export const TEAMINDICES = {
     'Warriors': 28,
     'Wizards': 29
 }
+export const TEAMINDICES = new Map(Object.entries(teamMapping));
 
 export const SITEINDICES = {
     'Fanduel' : 0,
@@ -41,3 +42,6 @@ export const TEAMS = [
     'Jazz', 'Kings', 'Knicks', 'Lakers', 'Magic', 'Mavericks', 'Nets', 'Nuggets', 'Pacers', 'Pelicans',
     'Pistons', 'Raptors', 'Rockets', 'Spurs', 'Suns', 'Thunder', 'Timberwolves', 'Trail Blazers', 'Warriors', 'Wizards'
   ];
+export let oddsArray = Array.from(Array(2), () => new Array(30));
+
+

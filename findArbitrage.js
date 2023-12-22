@@ -1,21 +1,20 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import { convertOddsToDecimal, isArbitragePossible, calculateProbability, calculateBet } from "./src/resources/calculations.js"
-//import { TEAMINDICES, SITEINDICES, TEAMS } from './globals.js';
+import { TEAMINDICES, SITEINDICES, TEAMS, oddsArray} from './globals.js';
 
 const fanduelNBA = 'https://sportsbook.fanduel.com/basketball?tab=nba';
 const draftkingsNBA = 'https://sportsbook.draftkings.com/leagues/basketball/nba';
 
-let temp = [];
 
-export default async function findArbitrage(data, logger){
+export default async function findArbitrage(games, data, logger){
     // console.log(data);
     await fanduelScraper(data);
     await draftkingsScraper(data);
 
-    console.log(temp);
+    // console.log(oddsArray);
 
-    //tryCombinations(sites, games, data, logger);
+    tryCombinations(games, oddsArray, logger);
 }
 
 async function fanduelScraper(teams) {
@@ -23,7 +22,7 @@ async function fanduelScraper(teams) {
     puppeteer.use(StealthPlugin());
     
     try{
-        const browser = await puppeteer.launch({ headless: false })
+        const browser = await puppeteer.launch({ headless: "new" })
         const page = await browser.newPage()
         await page.goto(fanduelNBA)
         for(let i = 0; i < teams.length; i++)
@@ -61,13 +60,13 @@ async function fanduelScraper(teams) {
             //convert odds to decimal value, and then convert decimal value to probability
             let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
             
-            temp.push(probability);
+            oddsArray[0][TEAMINDICES.get(teams[i])] = probability;
             
             
             
         }
         await browser.close();
-        
+        console.log('Fanduel done');
         
         
     } catch(e){
@@ -80,14 +79,15 @@ async function draftkingsScraper(teams) {
     
     puppeteer.use(StealthPlugin());
 
-    console.log('teams', teams);
+    //console.log('teams', teams);
     
     try{
+        const browser = await puppeteer.launch({ headless: "new" })
+        const page = await browser.newPage()
+        await page.goto(draftkingsNBA)
         for(let i = 0; i < teams.length; i++)
         {
-            const browser = await puppeteer.launch({ headless: true })
-            const page = await browser.newPage()
-            await page.goto(draftkingsNBA)
+            
             
             const elementsHTML = await page.$$eval(`div[aria-label*="${teams[i]}"]`, elements => 
                 elements.map(element => {
@@ -96,7 +96,7 @@ async function draftkingsScraper(teams) {
                     return oddsElement ? oddsElement.outerHTML : null;
                 })
             );
-            console.log('teams[' + i + ']:',elementsHTML);
+            // console.log('teams[' + i + ']:',elementsHTML);
 
             // const validElementsHTML = elementsHTML.filter(html => html !== null);
             
@@ -112,8 +112,8 @@ async function draftkingsScraper(teams) {
             line = line.substring(0,arrow);
 
 
-            console.log('line', line);
-            console.log('sign', line[0])
+            // console.log('line', line);
+            // console.log('sign', line[0])
             
             const negative = line[0] !== '+';
 
@@ -123,14 +123,17 @@ async function draftkingsScraper(teams) {
             
             //convert string number to integer
             const intValueOfString = negative ? parseInt(line) * -1 : parseInt(line);
-            console.log(intValueOfString);
+            // console.log(intValueOfString);
             
             //convert odds to decimal value, and then convert decimal value to probability
             let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
-            temp.push(probability);
+            oddsArray[1][TEAMINDICES.get(teams[i])] = probability;
             
-            await browser.close();
+            
         }
+        await browser.close();
+        console.log('Draftkings done');
+        
         
     } catch(e){
         console.log(e.stack);
@@ -141,36 +144,19 @@ async function draftkingsScraper(teams) {
 
 
 
-// function tryCombinations(SITEINDICES, games, data, logger) {
-//     for (const game in games) {
+function tryCombinations(games, logger) {
+    for (let game of games) {
+        let team1 = game[0];
+        let team2 = game[1];
 
-//         // depends on how we store games
-//         const team1 = game[0]
-//         const team2 = game[1]
+        let oddsTeam1Team2 = [oddsArray[0][TEAMINDICES.get(team1)], oddsArray[1][TEAMINDICES.get(team2)]];
+        let oddsTeam2Team1 = [oddsArray[0][TEAMINDICES.get(team2)], oddsArray[1][TEAMINDICES.get(team1)]];
 
-//         // somehow get indices of team1 and team2 in data
-//         const team1Index = TEAMINDICES[team1]
-//         const team2Index = TEAMINDICES[team2]
+        let arbitragePossibleTeam1Team2 = isArbitragePossible(oddsTeam1Team2);
+        let arbitragePossibleTeam2Team1 = isArbitragePossible(oddsTeam2Team1);
 
-//         // these two loops try all combinations of sites
-//         for (let i=0; i<SITEINDICES.length; i++) {
-//             for (let j=i+1; j<SITEINDICES.length; j++) {
-//                 if (isArbitragePossible(data[i][team1Index], data[j][team2])) {
-//                     logger.info(`Arbitrage possible for ${team1} and ${team2} between ${i} and ${j}`)
-//                 } else {
-//                     console.log(`Arbitrage not possible for ${team1} and ${team2} between ${i} and ${j}`)
-//                 }
-//             }
-//         }
-
-//         for (let i=0; i<SITEINDICES.length; i++) {
-//             for (let j=i+1; j<SITEINDICES.length; j++) {
-//                 if (isArbitragePossible(data[i][team2Index], data[j][team1Index])) {
-//                     logger.info(`Arbitrage possible for ${team1} and ${team2} between ${i} and ${j}`)
-//                 } else {
-//                     console.log(`Arbitrage not possible for ${team1} and ${team2} between ${i} and ${j}`)
-//                 }
-//             }
-//         }
-//     }
-// }
+        console.log(`Arbitrage possible for ${team1} vs ${team2}: ${arbitragePossibleTeam1Team2}`);
+        console.log(`Arbitrage possible for ${team2} vs ${team1}: ${arbitragePossibleTeam2Team1}`);
+    }
+    console.log('tryCombinations done');
+}
