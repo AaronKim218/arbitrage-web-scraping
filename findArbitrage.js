@@ -33,8 +33,6 @@ async function fanduelScraper(teams) {
             const elements = await page.$$(`div[aria-label*="${teams[i]}"]`);
             // console.log('teams[' + i + ']:',elements);
             const elementsHTML = await Promise.all(elements.map(element => element.evaluate(node => node.outerHTML)));
-            // console.log('teams[' + i + ']:',elementsHTML);
-            // console.log('teams[' + i + ']:',elementsHTML);
             //line will contain all of the html information, so we need to append it down to only have the odds"
             let line = elementsHTML[1];
             // console.log(line);
@@ -58,7 +56,7 @@ async function fanduelScraper(teams) {
             
             //convert string number to integer
             const intValueOfString = parseInt(line);
-            // console.log(intValueOfString);
+            // console.log('val', intValueOfString);
             
             //convert odds to decimal value, and then convert decimal value to probability
             let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
@@ -81,6 +79,8 @@ async function fanduelScraper(teams) {
 async function draftkingsScraper(teams) {
     
     puppeteer.use(StealthPlugin());
+
+    console.log('teams', teams);
     
     try{
         for(let i = 0; i < teams.length; i++)
@@ -96,6 +96,8 @@ async function draftkingsScraper(teams) {
                     return oddsElement ? oddsElement.outerHTML : null;
                 })
             );
+            console.log('teams[' + i + ']:',elementsHTML);
+
             // const validElementsHTML = elementsHTML.filter(html => html !== null);
             
             //line will contain all of the html information, so we need to append it down to only have the odds"
@@ -108,12 +110,20 @@ async function draftkingsScraper(teams) {
 
             arrow = line.indexOf('<');
             line = line.substring(0,arrow);
+
+
+            console.log('line', line);
+            console.log('sign', line[0])
             
-            
+            const negative = line[0] !== '+';
+
+            if (negative) {
+                line = line.substring(1);
+            }
             
             //convert string number to integer
-            const intValueOfString = parseInt(line);
-            // console.log(intValueOfString);
+            const intValueOfString = negative ? parseInt(line) * -1 : parseInt(line);
+            console.log(intValueOfString);
             
             //convert odds to decimal value, and then convert decimal value to probability
             let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));

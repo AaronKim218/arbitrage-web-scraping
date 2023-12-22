@@ -6,7 +6,7 @@ import getGames from "./getGames.js"
 
 async function main() {
     let data = await getGames();
-    // console.log(data);
+    console.log('data', data);
     let flattenedData = data.reduce((acc, val) => acc.concat(val), []);
     // console.log('flatten', flattenedData);
     // flattenedData = flattenedData.slice(12);
