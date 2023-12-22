@@ -2,20 +2,18 @@ import findArbitrage from "./findArbitrage.js";
 import logger from "./logger.js";
 import getGames from "./getGames.js"
 
-let data = Array.from(Array(2), () => new Array(30));
+//let data = Array.from(Array(2), () => new Array(30));
 
 async function main() {
+    let data = await getGames();
+    // console.log(data);
+    let flattenedData = data.reduce((acc, val) => acc.concat(val), []);
+    console.log(flattenedData);
+    
+    await findArbitrage(flattenedData, logger);
+
     
     
-
-    // const GAMES = ['Lakers'];
-    // const SITES = ['FANDUEL'];
-
-    // for (const game in GAMES) {
-    //     findArbitrage(logger);
-    // }
-    findArbitrage(logger);
-    //getGames();
 
 }
 

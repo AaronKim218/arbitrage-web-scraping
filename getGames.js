@@ -17,7 +17,7 @@ export default async function getGames(){
     puppeteer.use(StealthPlugin());
     
     try{
-        const browser = await puppeteer.launch({ headless: false })
+        const browser = await puppeteer.launch({ headless: true })
         const page = await browser.newPage()
         await page.goto(url);
         const gameData = await page.$$eval('div[class*=GameCardMatchup_wrapper]', divs => divs.map(div => div.outerHTML));
@@ -37,7 +37,7 @@ export default async function getGames(){
 
             j = line.indexOf('<');
             data[i][0] = line.substring(0,j);
-            console.log(data[i][0]);
+            
 
             j = line.indexOf('MatchupCardTeamName_teamName__') + 30;
             line = line.substring(j, line.length);
@@ -50,10 +50,11 @@ export default async function getGames(){
             j = line.indexOf('<');
             data[i][1] = line.substring(0,j);
         }
-        console.log(data);
+        await browser.close();
+        return data;
     
         
-        await browser.close();
+        
 
     } catch(e){
         console.log(e.stack);
