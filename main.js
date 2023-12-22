@@ -9,7 +9,7 @@ async function main() {
     // console.log(data);
     let flattenedData = data.reduce((acc, val) => acc.concat(val), []);
     // console.log('flatten', flattenedData);
-    flattenedData = flattenedData.slice(12);
+    // flattenedData = flattenedData.slice(12);
     // console.log('flatten', flattenedData);
     await findArbitrage(flattenedData, logger);
 

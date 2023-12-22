@@ -17,10 +17,14 @@ export default async function getGames(){
     puppeteer.use(StealthPlugin());
     
     try{
-        const browser = await puppeteer.launch({ headless: true })
+        const browser = await puppeteer.launch({ headless: "new" })
         const page = await browser.newPage()
         await page.goto(url, { waitUntil: 'networkidle2' });
-        const gameData = await page.$$eval('div[class*=GameCardMatchup_wrapper]', divs => divs.map(div => div.outerHTML));
+        const gameData = await page.$$eval('div[class*=GameCardMatchup_wrapper]', divs =>
+            divs.filter(div => {
+                const span = div.querySelector('.LiveBadge_lb__qV_my.GameCardMatchupStatusText_gcsBadge__bWCRV');
+                return !span || (span && span.textContent.trim() !== 'LIVE');
+            }).map(div => div.outerHTML));
         const numGames = gameData.length;
         let data = Array.from(Array(numGames), () => new Array(2));
         for(let i = 0; i < numGames; i++)

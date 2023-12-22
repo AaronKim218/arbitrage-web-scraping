@@ -83,42 +83,41 @@ async function draftkingsScraper(teams) {
     puppeteer.use(StealthPlugin());
     
     try{
-        for(const team in teams)
+        for(let i = 0; i < teams.length; i++)
         {
-            console.log(team);
             const browser = await puppeteer.launch({ headless: true })
             const page = await browser.newPage()
             await page.goto(draftkingsNBA)
             
-            const elementsHTML = await page.$$eval(`div[aria-label*="${team}"]`, elements => 
+            const elementsHTML = await page.$$eval(`div[aria-label*="${teams[i]}"]`, elements => 
                 elements.map(element => {
                     // Get the div within that div that has the class "sportsbook-odds"
                     const oddsElement = element.querySelector('.sportsbook-odds');
                     return oddsElement ? oddsElement.outerHTML : null;
                 })
             );
-            //const validElementsHTML = elementsHTML.filter(html => html !== null);
+            // const validElementsHTML = elementsHTML.filter(html => html !== null);
             
             //line will contain all of the html information, so we need to append it down to only have the odds"
             let line = elementsHTML[1];
             
 
-            // //removes excess html in beginning
-            // let arrow = line.indexOf('>');
-            // line = line.substring(arrow+1,line.length);
+            //removes excess html in beginning
+            let arrow = line.indexOf('>');
+            line = line.substring(arrow+1,line.length);
 
-            // arrow = line.indexOf('<');
-            // line = line.substring(0,arrow);
+            arrow = line.indexOf('<');
+            line = line.substring(0,arrow);
             
             
             
-            // //convert string number to integer
-            // const intValueOfString = parseInt(line);
-            // // console.log(intValueOfString);
+            //convert string number to integer
+            const intValueOfString = parseInt(line);
+            // console.log(intValueOfString);
             
-            // //convert odds to decimal value, and then convert decimal value to probability
-            // let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
-            // temp.push(probability);
+            //convert odds to decimal value, and then convert decimal value to probability
+            let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
+            temp.push(probability);
             
             await browser.close();
         }
