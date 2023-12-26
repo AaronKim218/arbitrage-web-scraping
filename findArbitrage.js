@@ -24,7 +24,7 @@ async function fanduelScraper(teams) {
     try{
         const browser = await puppeteer.launch({ headless: "new" })
         const page = await browser.newPage()
-        await page.goto(fanduelNBA, { waitUntil: 'domcontentloaded' })
+        await page.goto(fanduelNBA, { waitUntil: 'networkidle2' })
         for(let i = 0; i < teams.length; i++)
         {
             
@@ -83,12 +83,13 @@ async function draftkingsScraper(teams) {
     
     
 
-    try {
+    
         const browser = await puppeteer.launch({ headless: "new" })
         const page = await browser.newPage()
-        await page.goto(draftkingsNBA, { waitUntil: 'domcontentloaded' })
+        await page.goto(draftkingsNBA, { waitUntil: 'networkidle2' })
         for(let i = 0; i < teams.length; i++)
         {
+            try{
             const elementsHTML = await page.$$eval(`div[aria-label*="${teams[i]}"]`, elements => 
             elements.map(element => {
                 // Get the div within that div that has the class "sportsbook-odds"
@@ -102,7 +103,7 @@ async function draftkingsScraper(teams) {
             
             //line will contain all of the html information, so we need to append it down to only have the odds"
             let line = elementsHTML[1];
-            //console.log('team',teams[i]);
+            // console.log(teams[i]);
             // console.log('line', line);
             
 
@@ -130,18 +131,16 @@ async function draftkingsScraper(teams) {
             //convert odds to decimal value, and then convert decimal value to probability
             let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
             oddsArray[1][TEAMINDICES.get(teams[i])] = probability;
+            
+            }
+            catch(e) {
+                console.log(e.stack);
+                console.log(e.name);
+                console.log(e.message);
+    
+            }
         }
-            await browser.close();
-            console.log('draftkingsScraper() done');
-        
-    } catch(e) {
-        console.log(e.stack);
-        console.log(e.name);
-        console.log(e.message);
-    }
 }
-
-
 
 function tryCombinations(games, logger) {
 
