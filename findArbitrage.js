@@ -95,7 +95,7 @@ async function draftkingsScraper(teams) {
                 // Get the div within that div that has the class "sportsbook-odds"
                 const oddsElement = element.querySelector('[class*="sportsbook-odds"]');
                 return oddsElement ? oddsElement.outerHTML : null;
-                })
+                }).filter(item => item !== null)
             );
             // console.log('teams[' + i + ']:' + elementsHTML);
 
