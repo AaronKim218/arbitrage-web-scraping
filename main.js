@@ -14,6 +14,7 @@ async function main() {
         // console.log('teams', teams);
         
         await findArbitrage(matchups, teams, logger);
+        process.exit(0);
     }
     catch(e)
     {
