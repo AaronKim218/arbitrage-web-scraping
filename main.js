@@ -5,14 +5,23 @@ import getGames from "./getGames.js"
 
 
 async function main() {
-    let todaysTeams = await getGames();
-    // console.log(todaysTeams);
+    try{
+        let matchups = await getGames();
+        // console.log(matchups);
+        
+        //just different syntax that does the same thing
+        let teams = [].concat(...matchups);
+        // console.log('teams', teams);
+        
+        await findArbitrage(matchups, teams, logger);
+    }
+    catch(e)
+    {
+        console.log(e.stack);
+        console.log(e.name);
+        console.log(e.message);
+    }
     
-    //just different syntax that does the same thing
-    let flattenedData = [].concat(...todaysTeams);
-    // console.log('flatten', flattenedData);
-    
-    await findArbitrage(todaysTeams, flattenedData, logger);
 
     
     

@@ -7,10 +7,10 @@ const fanduelNBA = 'https://sportsbook.fanduel.com/basketball?tab=nba';
 const draftkingsNBA = 'https://sportsbook.draftkings.com/leagues/basketball/nba';
 
 
-export default async function findArbitrage(games, data, logger){
-    // console.log(data);
-    await fanduelScraper(data);
-    await draftkingsScraper(data);
+export default async function findArbitrage(games, teams, logger){
+    // console.log(teams);
+    await fanduelScraper(teams);
+    await draftkingsScraper(teams);
 
     // console.log(oddsArray);
 
@@ -66,7 +66,7 @@ async function fanduelScraper(teams) {
             
         }
         await browser.close();
-        console.log('Fanduel done');
+        console.log('fanduelScraper() done');
         
         
     } catch(e){
@@ -79,7 +79,7 @@ async function draftkingsScraper(teams) {
     
     puppeteer.use(StealthPlugin());
 
-    //console.log('teams', teams);
+    // console.log('teams', teams);
     
     
 
@@ -92,17 +92,17 @@ async function draftkingsScraper(teams) {
             const elementsHTML = await page.$$eval(`div[aria-label*="${teams[i]}"]`, elements => 
             elements.map(element => {
                 // Get the div within that div that has the class "sportsbook-odds"
-                const oddsElement = element.querySelector('.sportsbook-odds.american.no-margin.default-color');
+                const oddsElement = element.querySelector('[class*="sportsbook-odds"]');
                 return oddsElement ? oddsElement.outerHTML : null;
                 })
             );
-            // console.log('teams[' + i + ']:',elementsHTML);
+            // console.log('teams[' + i + ']:' + elementsHTML);
 
             // const validElementsHTML = elementsHTML.filter(html => html !== null);
             
             //line will contain all of the html information, so we need to append it down to only have the odds"
             let line = elementsHTML[1];
-            // console.log('team',teams[i]);
+            //console.log('team',teams[i]);
             // console.log('line', line);
             
 
@@ -132,7 +132,7 @@ async function draftkingsScraper(teams) {
             oddsArray[1][TEAMINDICES.get(teams[i])] = probability;
         }
             await browser.close();
-            console.log('Draftkings done');
+            console.log('draftkingsScraper() done');
         
     } catch(e) {
         console.log(e.stack);
@@ -162,5 +162,5 @@ function tryCombinations(games, logger) {
         console.log(`Arbitrage possible for ${team1} on site ${SITES[0]} vs ${team2} on site ${SITES[1]}: ${arbitragePossibleTeam1Team2}`);
         console.log(`Arbitrage possible for ${team2} on site ${SITES[0]} vs ${team1} on site ${SITES[1]}: ${arbitragePossibleTeam2Team1}`);
     }
-    console.log('tryCombinations done');
+    console.log('tryCombinations() done');
 }
