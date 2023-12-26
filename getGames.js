@@ -15,22 +15,23 @@ export default async function getGames(){
     globalDate = currentMonth + '-' + currentDay + '-' + currentYear;
     
     puppeteer.use(StealthPlugin());
-    
     try{
         const browser = await puppeteer.launch({ headless: "new" })
         const page = await browser.newPage()
-        await page.goto(url, { waitUntil: 'domcontentloaded' });
+        await page.goto(url, { waitUntil: 'networkidle2' });
         const gameData = await page.$$eval('div[class*=GameCardMatchup_wrapper]', divs =>
-            divs.filter(div => {
-                const span = div.querySelector('.LiveBadge_lb__qV_my.GameCardMatchupStatusText_gcsBadge__bWCRV');
-                return !span || (span && span.textContent.trim() !== 'LIVE');
-            }).map(div => div.outerHTML));
+            divs.map(div => div.outerHTML));
         const numGames = gameData.length;
-        let data = Array.from(Array(numGames), () => new Array(2));
+        let data = [];
         for(let i = 0; i < numGames; i++)
         {
             let line = gameData[i];
+            let temp = [];
             
+            let validGameCheck = line.charAt(line.indexOf('data-game-status') + 18);
+            if(validGameCheck == '2' || validGameCheck == '3')
+                continue;
+        
             let j = line.indexOf('MatchupCardTeamName_teamName__') + 30;
             line = line.substring(j, line.length);
            
@@ -40,7 +41,7 @@ export default async function getGames(){
             
 
             j = line.indexOf('<');
-            data[i][0] = line.substring(0,j);
+            temp.push(line.substring(0,j));
             
 
             j = line.indexOf('MatchupCardTeamName_teamName__') + 30;
@@ -52,7 +53,9 @@ export default async function getGames(){
             
 
             j = line.indexOf('<');
-            data[i][1] = line.substring(0,j);
+            temp.push(line.substring(0,j));
+
+            data.push(temp);
         }
         await browser.close();
         console.log('getGames() done');

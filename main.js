@@ -6,11 +6,12 @@ import getGames from "./getGames.js"
 
 async function main() {
     let todaysTeams = await getGames();
-    // console.log('data', data);
-    let flattenedData = todaysTeams.reduce((acc, val) => acc.concat(val), []);
+    // console.log(todaysTeams);
+    
+    //just different syntax that does the same thing
+    let flattenedData = [].concat(...todaysTeams);
     // console.log('flatten', flattenedData);
-    // flattenedData = flattenedData.slice(12);
-    // console.log('flatten', flattenedData);
+    
     await findArbitrage(todaysTeams, flattenedData, logger);
 
     

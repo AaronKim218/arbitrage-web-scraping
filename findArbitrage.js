@@ -34,8 +34,9 @@ async function fanduelScraper(teams) {
             const elementsHTML = await Promise.all(elements.map(element => element.evaluate(node => node.outerHTML)));
             //line will contain all of the html information, so we need to append it down to only have the odds"
             let line = elementsHTML[1];
-            console.log('team',teams[i])
-            console.log('line', line)
+            
+            // console.log('team',teams[i])
+            // console.log('line', line)
             
             
             //removes excess html in beginning
@@ -80,28 +81,29 @@ async function draftkingsScraper(teams) {
 
     //console.log('teams', teams);
     
-    const browser = await puppeteer.launch({ headless: "new" })
-    const page = await browser.newPage()
-    await page.goto(draftkingsNBA, { waitUntil: 'domcontentloaded' })
-    for(let i = 0; i < teams.length; i++)
-    {
+    
 
-        try {
+    try {
+        const browser = await puppeteer.launch({ headless: "new" })
+        const page = await browser.newPage()
+        await page.goto(draftkingsNBA, { waitUntil: 'domcontentloaded' })
+        for(let i = 0; i < teams.length; i++)
+        {
             const elementsHTML = await page.$$eval(`div[aria-label*="${teams[i]}"]`, elements => 
             elements.map(element => {
                 // Get the div within that div that has the class "sportsbook-odds"
                 const oddsElement = element.querySelector('.sportsbook-odds.american.no-margin.default-color');
                 return oddsElement ? oddsElement.outerHTML : null;
-            })
-        );
+                })
+            );
             // console.log('teams[' + i + ']:',elementsHTML);
 
             // const validElementsHTML = elementsHTML.filter(html => html !== null);
             
             //line will contain all of the html information, so we need to append it down to only have the odds"
             let line = elementsHTML[1];
-            console.log('team',teams[i])
-            console.log('line', line)
+            // console.log('team',teams[i]);
+            // console.log('line', line);
             
 
             //removes excess html in beginning
@@ -128,19 +130,15 @@ async function draftkingsScraper(teams) {
             //convert odds to decimal value, and then convert decimal value to probability
             let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
             oddsArray[1][TEAMINDICES.get(teams[i])] = probability;
-
-        } catch(e) {
-            console.log(e.stack);
-            console.log(e.name);
-            console.log(e.message);
         }
+            await browser.close();
+            console.log('Draftkings done');
         
-        
+    } catch(e) {
+        console.log(e.stack);
+        console.log(e.name);
+        console.log(e.message);
     }
-    await browser.close();
-    console.log('Draftkings done');
-        
-        
 }
 
 
