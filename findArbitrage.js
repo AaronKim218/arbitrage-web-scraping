@@ -5,12 +5,14 @@ import { TEAMINDICES, SITEINDICES, TEAMS, oddsArray, SITES} from './globals.js';
 
 const fanduelNBA = 'https://sportsbook.fanduel.com/basketball?tab=nba';
 const draftkingsNBA = 'https://sportsbook.draftkings.com/leagues/basketball/nba';
+const espnbetNBA = 'https://espnbet.com/sport/basketball/organization/united-states/competition/nba/featured-page'
 
 
 export default async function findArbitrage(games, teams, logger){
     // console.log(teams);
     await fanduelScraper(teams);
     await draftkingsScraper(teams);
+    await espnbetScraper(teams);
 
     // console.log(oddsArray);
 
@@ -120,9 +122,8 @@ async function draftkingsScraper(teams) {
             
             const negative = line[0] !== '+';
 
-            if (negative) {
-                line = line.substring(1);
-            }
+            // remove plus or minus sign
+            line = line.substring(1);
             
             //convert string number to integer
             const intValueOfString = negative ? parseInt(line) * -1 : parseInt(line);
@@ -139,7 +140,89 @@ async function draftkingsScraper(teams) {
                 console.log(e.message);
     
             }
+
         }
+        console.log('draftkingsScraper() done');
+
+}
+
+async function espnbetScraper(teams) {
+    
+    puppeteer.use(StealthPlugin());
+
+    const browser = await puppeteer.launch({ headless: "new" })
+    const page = await browser.newPage()
+    await page.goto(espnbetNBA, { waitUntil: 'networkidle2' })
+    for(let i = 0; i < teams.length; i++)
+    {
+        try{
+            const elementsHTML = await page.$$eval(`img[alt*="${teams[i]}"]`, elements => 
+                elements.map(element => {
+                    // Navigate up to the 4th parent
+                    let fourthParent = element;
+                    for (let j = 0; j < 4; j++) {
+                        if (fourthParent.parentElement) {
+                            fourthParent = fourthParent.parentElement;
+                        } else {
+                            // If there aren't enough parent elements, return null
+                            return null;
+                        }
+                    }
+
+                    // Get the second child of the 4th parent
+                    const secondChild = fourthParent.children[1];
+                    if (!secondChild) {
+                        return null;
+                    }
+
+                    // Get the third button within the second child
+                    const buttons = secondChild.querySelectorAll('button');
+                    if (buttons && buttons.length >= 3) {
+                        // Get the second span within the third button
+                        const spans = buttons[2].querySelectorAll('span');
+                        if (spans && spans.length >= 2) {
+                            return spans[1].outerHTML;
+                        }
+                    }
+
+                    return null;
+                }).filter(item => item !== null)
+            );
+            console.log(teams[i], elementsHTML);
+            
+            let line = elementsHTML[0];
+            
+            //removes excess html in beginning
+            line = line.substring(1, line.length - 1);
+
+            let arrow = line.indexOf('>');
+            line = line.substring(arrow+1,line.length);
+            arrow = line.indexOf('<');
+            line = line.substring(0,arrow);
+            
+            // boolean that represents negative or not
+            const negative = line[0] !== '+';
+
+            // remove plus or minus sign
+            line = line.substring(1);
+            
+            const intValueOfString = negative ? parseInt(line) * -1 : parseInt(line);
+            let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
+            console.log('prob', probability)
+            oddsArray[2][TEAMINDICES.get(teams[i])] = probability;
+            
+        }
+        catch(e) {
+            console.log(e.stack);
+            console.log(e.name);
+            console.log(e.message);
+
+        }
+    }
+
+    console.log('odds arr', oddsArray)
+    console.log('espnbetScraper() done');
+
 }
 
 function tryCombinations(games, logger) {
@@ -149,17 +232,33 @@ function tryCombinations(games, logger) {
         let team1 = game[0];
         let team2 = game[1];
 
-        let oddsTeam1Team2 = [oddsArray[0][TEAMINDICES.get(team1)], oddsArray[1][TEAMINDICES.get(team2)]];
-        let oddsTeam2Team1 = [oddsArray[0][TEAMINDICES.get(team2)], oddsArray[1][TEAMINDICES.get(team1)]];
+        // let oddsTeam1Team2 = [oddsArray[0][TEAMINDICES.get(team1)], oddsArray[1][TEAMINDICES.get(team2)]];
+        // let oddsTeam2Team1 = [oddsArray[0][TEAMINDICES.get(team2)], oddsArray[1][TEAMINDICES.get(team1)]];
 
-        console.log('team 1 team 2', oddsTeam1Team2);
-        console.log('team 2 team 1', oddsTeam2Team1);
+        // console.log('team 1 team 2', oddsTeam1Team2);
+        // console.log('team 2 team 1', oddsTeam2Team1);
 
-        let arbitragePossibleTeam1Team2 = isArbitragePossible(oddsTeam1Team2);
-        let arbitragePossibleTeam2Team1 = isArbitragePossible(oddsTeam2Team1);
+        // let arbitragePossibleTeam1Team2 = isArbitragePossible(oddsTeam1Team2);
+        // let arbitragePossibleTeam2Team1 = isArbitragePossible(oddsTeam2Team1);
 
-        console.log(`Arbitrage possible for ${team1} on site ${SITES[0]} vs ${team2} on site ${SITES[1]}: ${arbitragePossibleTeam1Team2}`);
-        console.log(`Arbitrage possible for ${team2} on site ${SITES[0]} vs ${team1} on site ${SITES[1]}: ${arbitragePossibleTeam2Team1}`);
+        // console.log(`Arbitrage possible for ${team1} on site ${SITES[0]} vs ${team2} on site ${SITES[1]}: ${arbitragePossibleTeam1Team2}`);
+        // console.log(`Arbitrage possible for ${team2} on site ${SITES[0]} vs ${team1} on site ${SITES[1]}: ${arbitragePossibleTeam2Team1}`);
+
+        for (let i = 0; i < SITES.length; i++) {
+            for (let j = 0; j < SITES.length; j++) {
+                if (i === j) {
+                    continue;
+                }
+
+                let oddsTeam1Team2 = [oddsArray[i][TEAMINDICES.get(team1)], oddsArray[j][TEAMINDICES.get(team2)]];
+
+                console.log('team 1 team 2', oddsTeam1Team2);
+
+                let arbitragePossibleTeam1Team2 = isArbitragePossible(oddsTeam1Team2);
+
+                console.log(`Arbitrage possible for ${team1} on site ${SITES[i]} vs ${team2} on site ${SITES[j]}: ${arbitragePossibleTeam1Team2}`);
+            }
+        }
     }
     console.log('tryCombinations() done');
 }
