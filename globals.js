@@ -37,13 +37,13 @@ export const SITEINDICES = {
     'Draftkings' : 1
 }
 
-export const SITES = ['Fanduel', 'Draftkings', 'ESPNBET'];
+export const SITES = ['Fanduel', 'Draftkings', 'ESPNBET', 'BetRivers'];
 
 export const TEAMS = [
     '76ers', 'Bucks', 'Bulls', 'Cavaliers', 'Celtics', 'Clippers', 'Grizzlies', 'Hawks', 'Heat', 'Hornets',
     'Jazz', 'Kings', 'Knicks', 'Lakers', 'Magic', 'Mavericks', 'Nets', 'Nuggets', 'Pacers', 'Pelicans',
     'Pistons', 'Raptors', 'Rockets', 'Spurs', 'Suns', 'Thunder', 'Timberwolves', 'Trail Blazers', 'Warriors', 'Wizards'
   ];
-export let oddsArray = Array.from(Array(3), () => new Array(30));
+export let oddsArray = Array.from(Array(4), () => new Array(30));
 
 

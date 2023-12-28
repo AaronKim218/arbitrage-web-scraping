@@ -6,6 +6,7 @@ import { TEAMINDICES, SITEINDICES, TEAMS, oddsArray, SITES} from './globals.js';
 const fanduelNBA = 'https://sportsbook.fanduel.com/basketball?tab=nba';
 const draftkingsNBA = 'https://sportsbook.draftkings.com/leagues/basketball/nba';
 const espnbetNBA = 'https://espnbet.com/sport/basketball/organization/united-states/competition/nba/featured-page'
+const betriversNBA = 'https://nj.betrivers.com/?page=sportsbook&group=1000093652&type=matches'
 
 
 export default async function findArbitrage(games, teams, logger){
@@ -13,6 +14,7 @@ export default async function findArbitrage(games, teams, logger){
     await fanduelScraper(teams);
     await draftkingsScraper(teams);
     await espnbetScraper(teams);
+    await betriversScraper(teams);
 
     // console.log(oddsArray);
 
@@ -199,6 +201,12 @@ async function espnbetScraper(teams) {
             line = line.substring(arrow+1,line.length);
             arrow = line.indexOf('<');
             line = line.substring(0,arrow);
+
+            if (line === 'Even') {
+                line = '+100';
+            }
+
+            console.log(`${teams[i]}`, line);
             
             // boolean that represents negative or not
             const negative = line[0] !== '+';
@@ -222,6 +230,60 @@ async function espnbetScraper(teams) {
 
     console.log('odds arr', oddsArray)
     console.log('espnbetScraper() done');
+
+}
+
+async function betriversScraper(teams) {
+    
+    puppeteer.use(StealthPlugin());
+
+    const browser = await puppeteer.launch({ headless: "new" })
+    const page = await browser.newPage()
+    await page.goto(betriversNBA, { waitUntil: 'networkidle2' })
+    for(let i = 0; i < teams.length; i++)
+    {
+        try{
+            const elementsHTML = await page.$$eval(`button[aria-label*="Moneyline"]`, (buttons, teamName) => 
+                buttons.map(button => {
+                    if (button.getAttribute('aria-label').includes(teamName)) {
+                        return button.getAttribute('aria-label');
+                    }
+                    return null;
+                }).filter(item => item !== null),
+                teams[i]
+            );
+            
+            let ariaLabel = elementsHTML[0];
+
+            console.log('aria label', ariaLabel);
+        
+
+            let start = ariaLabel.indexOf('at ') + 3;
+            ariaLabel = ariaLabel.substring(start, ariaLabel.length);
+
+            // boolean that represents negative or not
+            const negative = ariaLabel[0] !== '+';
+
+            // remove plus or minus sign
+            ariaLabel = ariaLabel.substring(1);
+            
+            const intValueOfString = negative ? parseInt(ariaLabel) * -1 : parseInt(ariaLabel);
+            let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
+            console.log(teams[i], 'betrivers')
+            console.log('prob', probability)
+            oddsArray[3][TEAMINDICES.get(teams[i])] = probability;
+            
+        }
+        catch(e) {
+            console.log(e.stack);
+            console.log(e.name);
+            console.log(e.message);
+
+        }
+    }
+
+    console.log('odds arr', oddsArray)
+    console.log('betriversScraper() done');
 
 }
 
