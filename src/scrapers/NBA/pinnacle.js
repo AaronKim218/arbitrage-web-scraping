@@ -3,7 +3,7 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import { calculateProbability } from "../../resources/calculations.js";
 import { TEAMINDICES, oddsArray} from '../../globals.js';
 
-const pinnacleNBA = 'https://www.pinnacle.com/en/basketball/matchups/'
+const pinnacleNBA = 'https://www.pinnacle.com/en/basketball/nba/matchups/#period:0'
 
 export default async function pinnacleScraper(teams) {
 
