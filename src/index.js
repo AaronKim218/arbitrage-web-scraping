@@ -1,8 +1,6 @@
 import findArbitrage from "./findArbitrage.js";
-import logger from "./logger.js";
-import getGames from "./getGames.js"
-
-
+import logger from "./utils/logger.js";
+import getGames from "./scrapers/NBA/getGames.js"
 
 async function main() {
     try{
