@@ -1,6 +1,6 @@
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
-import { TEAMS } from './globals.js';
+import { TEAMS } from '../../globals.js';
 
 let globalDate = '';
 
