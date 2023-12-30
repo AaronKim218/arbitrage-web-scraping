@@ -59,11 +59,11 @@ export default async function pinnacleScraper(teams) {
             
             let text = elementsHTML[0];
 
-            console.log('span text', text);
+            // console.log('span text', text);
             
             let probability = parseFloat(calculateProbability(parseFloat(text)));
-            console.log(teams[i], 'pinnacle')
-            console.log('prob', probability)
+            // console.log(teams[i], 'pinnacle')
+            // console.log('prob', probability)
             oddsArray[4][TEAMINDICES.get(teams[i])] = probability;
             
         }
@@ -75,7 +75,7 @@ export default async function pinnacleScraper(teams) {
         }
     }
 
-    console.log('odds arr', oddsArray)
+    // console.log('odds arr', oddsArray)
     console.log('betriversScraper() done');
 
 }

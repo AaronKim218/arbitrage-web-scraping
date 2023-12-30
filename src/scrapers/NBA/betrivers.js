@@ -3,7 +3,7 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import { convertOddsToDecimal, calculateProbability } from "../../resources/calculations.js";
 import { TEAMINDICES, oddsArray} from '../../globals.js';
 
-const betriversNBA = 'https://nj.betrivers.com/?page=sportsbook&group=1000093652&type=matches'
+const betriversNBA = 'https://pa.betrivers.com/?page=sportsbook&l=RiversPittsburgh&group=1000093652&type=matches'
 
 export default async function betriversScraper(teams) {
     
@@ -27,7 +27,7 @@ export default async function betriversScraper(teams) {
             
             let ariaLabel = elementsHTML[0];
 
-            console.log('aria label', ariaLabel);
+            // console.log('aria label', ariaLabel);
         
 
             let start = ariaLabel.indexOf('at ') + 3;
@@ -41,8 +41,8 @@ export default async function betriversScraper(teams) {
             
             const intValueOfString = negative ? parseInt(ariaLabel) * -1 : parseInt(ariaLabel);
             let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
-            console.log(teams[i], 'betrivers')
-            console.log('prob', probability)
+            // console.log(teams[i], 'betrivers')
+            // console.log('prob', probability)
             oddsArray[3][TEAMINDICES.get(teams[i])] = probability;
             
         }
@@ -54,7 +54,7 @@ export default async function betriversScraper(teams) {
         }
     }
 
-    console.log('odds arr', oddsArray)
+    // console.log('odds arr', oddsArray)
     console.log('betriversScraper() done');
 
 }

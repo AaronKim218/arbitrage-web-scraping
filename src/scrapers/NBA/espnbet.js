@@ -47,7 +47,7 @@ export default async function espnbetScraper(teams) {
                     return null;
                 }).filter(item => item !== null)
             );
-            console.log(teams[i], elementsHTML);
+            // console.log(teams[i], elementsHTML);
             
             let line = elementsHTML[0];
             
@@ -63,7 +63,7 @@ export default async function espnbetScraper(teams) {
                 line = '+100';
             }
 
-            console.log(`${teams[i]}`, line);
+            // console.log(`${teams[i]}`, line);
             
             // boolean that represents negative or not
             const negative = line[0] !== '+';
@@ -73,7 +73,7 @@ export default async function espnbetScraper(teams) {
             
             const intValueOfString = negative ? parseInt(line) * -1 : parseInt(line);
             let probability = parseFloat(calculateProbability(convertOddsToDecimal(intValueOfString)));
-            console.log('prob', probability)
+            // console.log('prob', probability)
             oddsArray[2][TEAMINDICES.get(teams[i])] = probability;
             
         }
@@ -85,7 +85,7 @@ export default async function espnbetScraper(teams) {
         }
     }
 
-    console.log('odds arr', oddsArray)
+    // console.log('odds arr', oddsArray)
     console.log('espnbetScraper() done');
 
 }

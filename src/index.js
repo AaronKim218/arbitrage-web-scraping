@@ -19,6 +19,7 @@ async function main() {
         console.log(e.stack);
         console.log(e.name);
         console.log(e.message);
+            
     }
     
 

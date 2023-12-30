@@ -2,8 +2,7 @@ import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import { TEAMS } from '../../globals.js';
 
-let globalDate = '';
-
+export let globalDate = '';
 export default async function getGames(){
     const currentDate = new Date();
     const currentYear = currentDate.getFullYear();
@@ -65,9 +64,15 @@ export default async function getGames(){
         
 
     } catch(e){
-        console.log(e.stack);
-        console.log(e.name);
-        console.log(e.message);
+        if(e.name == 'TimeoutError'){
+            console.log("Random Timeout Error in getGames()");
+            process.exit(0);
+        }
+        else{
+            console.log(e.stack);
+            console.log(e.name);
+            console.log(e.message);
+        }
     }
 
 }
