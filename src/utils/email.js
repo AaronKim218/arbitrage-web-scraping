@@ -12,18 +12,21 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-let mailOptions = {
-    from: 'aaronandquinn7@gmail.com',
-    to: 'akimyt2@gmail.com',
-    subject: 'Test',
-    text: 'Test'
-};
-
-transporter.sendMail(mailOptions, function(error, info){
-    if(error){
-        console.log(error);
-    }
-    else{
-        console.log('Email sent: ' + info.response);
-    }
-});
+export default async function emailCombinations(address, result) {
+    return new Promise((resolve, reject) => {
+        let mailOptions = {
+            from: 'aaronandquinn7@gmail.com',
+            to: address,
+            subject: 'Arbitrage Found',
+            text: result
+        };
+        
+        transporter.sendMail(mailOptions, function(error, info) {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(info.response);
+            }
+        });
+    });
+}

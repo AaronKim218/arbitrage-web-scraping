@@ -76,6 +76,6 @@ export default async function pinnacleScraper(teams) {
     }
 
     // console.log('odds arr', oddsArray)
-    console.log('betriversScraper() done');
+    console.log('pinnacleScraper() done');
 
 }

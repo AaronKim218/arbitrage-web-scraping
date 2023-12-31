@@ -3,7 +3,9 @@ import StealthPlugin from 'puppeteer-extra-plugin-stealth'
 import { convertOddsToDecimal, calculateProbability } from "../../resources/calculations.js";
 import { TEAMINDICES, oddsArray} from '../../globals.js';
 
-const betriversNBA = 'https://pa.betrivers.com/?page=sportsbook&l=RiversPittsburgh&group=1000093652&type=matches'
+const betriversPA = 'https://pa.betrivers.com/?page=sportsbook&l=RiversPittsburgh&group=1000093652&type=matches'
+const betriversNJ = 'https://nj.betrivers.com/?page=sportsbook&group=1000093652&type=matches'
+
 
 export default async function betriversScraper(teams) {
     
@@ -11,7 +13,7 @@ export default async function betriversScraper(teams) {
 
     const browser = await puppeteer.launch({ headless: "new" })
     const page = await browser.newPage()
-    await page.goto(betriversNBA, { waitUntil: 'networkidle2' })
+    await page.goto(betriversNJ, { waitUntil: 'networkidle2' })
     for(let i = 0; i < teams.length; i++)
     {
         try{
